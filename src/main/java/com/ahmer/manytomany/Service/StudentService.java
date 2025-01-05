@@ -49,4 +49,10 @@ public class StudentService {
     public List<Student> getAllStudents() {
         return studentRepository.findAll();
     }
+
+    public List<Course> getCoursesOfStudent(Long studentId){
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new IllegalArgumentException("Student with ID " + studentId + " does not exist."));
+        return List.copyOf(student.getCourses());
+    }
 }

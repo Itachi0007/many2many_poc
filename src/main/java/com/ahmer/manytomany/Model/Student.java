@@ -1,11 +1,16 @@
 package com.ahmer.manytomany.Model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Table(name = "students")
+@Getter
+@Setter
 public class Student {
 
     @Id
@@ -15,6 +20,7 @@ public class Student {
     @Column(nullable = false)
     private String name;
 
+    // A join table is used to establish the relationship in case of many-to-many
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(
             name = "student_courses",
@@ -23,34 +29,12 @@ public class Student {
     )
     private Set<Course> courses = new HashSet<>();
 
-    public Student() {}
-
+    //Constructors
     public Student(String name) {
         this.name = name;
     }
-
-    // Getters and Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Set<Course> getCourses() {
-        return courses;
-    }
-
-    public void setCourses(Set<Course> courses) {
-        this.courses = courses;
+    public Student(long id, String name) {
+        this.name=name;
+        this.id=id;
     }
 }
