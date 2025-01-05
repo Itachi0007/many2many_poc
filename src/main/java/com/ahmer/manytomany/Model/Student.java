@@ -15,7 +15,7 @@ public class Student {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long studentId;
 
     @Column(nullable = false)
     private String name;
@@ -29,12 +29,12 @@ public class Student {
     )
     private Set<Course> courses = new HashSet<>();
 
+
     //Constructors
-    public Student(String name) {
-        this.name = name;
-    }
+    public Student(){};
+    // For testing purposes
     public Student(long id, String name) {
-        this.name=name;
-        this.id=id;
+        this.name = name;
+        this.studentId = id;
     }
 }

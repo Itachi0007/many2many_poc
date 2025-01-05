@@ -27,7 +27,7 @@ public class StudentController {
         return ResponseEntity.ok(new ApiResponse<>(true, "Students fetched successfully", students));
     }
 
-    @GetMapping("/courses/{studentId}")
+    @GetMapping("/{studentId}/courses")
     public ResponseEntity<ApiResponse<List<Course>>> getCoursesbyStudent(@PathVariable Long studentId) {
         try {
             List<Course> courses = studentService.getCoursesOfStudent(studentId);

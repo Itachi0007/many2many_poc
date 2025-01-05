@@ -29,13 +29,13 @@ public class StudentService {
 
         for (Course course : student.getCourses()) {
             // Check if the course exists in the database
-            Optional<Course> existingCourse = courseRepository.findById(course.getId());
+            Optional<Course> existingCourse = courseRepository.findById(course.getCourseId());
             if (existingCourse.isPresent()) {
                 // Add the existing course to the set
                 existingCourses.add(existingCourse.get());
             } else {
                 // Throw an exception if the course does not exist
-                throw new IllegalArgumentException("Course with ID " + course.getId() + " does not exist.");
+                throw new IllegalArgumentException("Course with ID " + course.getCourseId() + " does not exist.");
             }
         }
 

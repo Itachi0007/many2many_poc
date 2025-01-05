@@ -28,14 +28,6 @@ public class CourseService {
         return courseRepository.findById(id);
     }
 
-    // Save a new course (only for creating standalone courses)
-    public Course saveCourse(Course course) {
-        if (course.getId() != null && courseRepository.existsById(course.getId())) {
-            throw new IllegalArgumentException("Course with ID " + course.getId() + " already exists.");
-        }
-        return courseRepository.save(course);
-    }
-
     // Update an existing course by ID
     public Course updateCourse(Long id, Course updatedCourse) {
         return courseRepository.findById(id)
@@ -59,5 +51,12 @@ public class CourseService {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new IllegalArgumentException("Course with ID " + courseId + " does not exist."));
         return List.copyOf(course.getStudents()); // Convert Set to List
+    }
+
+    public List<Course> saveCourses(List<Course> courses) {
+        if (courses == null || courses.isEmpty()) {
+            throw new IllegalArgumentException("Course list cannot be null or empty.");
+        }
+        return courseRepository.saveAll(courses);
     }
 }

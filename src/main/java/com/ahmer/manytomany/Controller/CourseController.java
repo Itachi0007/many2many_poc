@@ -35,12 +35,11 @@ public class CourseController {
                         .body(new ApiResponse<>(false, "Course with ID " + id + " not found", null)));
     }
 
-    // Create a new course
     @PostMapping
-    public ResponseEntity<ApiResponse<Course>> saveCourse(@RequestBody Course course) {
+    public ResponseEntity<ApiResponse<List<Course>>> saveCourses(@RequestBody List<Course> courses) {
         try {
-            Course savedCourse = courseService.saveCourse(course);
-            return ResponseEntity.ok(new ApiResponse<>(true, "Course created successfully", savedCourse));
+            List<Course> savedCourses = courseService.saveCourses(courses);
+            return ResponseEntity.ok(new ApiResponse<>(true, "Courses created successfully", savedCourses));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest()
                     .body(new ApiResponse<>(false, e.getMessage(), null));
