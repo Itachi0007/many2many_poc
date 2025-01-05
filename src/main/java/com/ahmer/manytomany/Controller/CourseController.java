@@ -1,6 +1,8 @@
 package com.ahmer.manytomany.Controller;
 
+import com.ahmer.manytomany.Model.ApiResponse;
 import com.ahmer.manytomany.Model.Course;
+import com.ahmer.manytomany.Model.Student;
 import com.ahmer.manytomany.Service.CourseService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,41 +19,67 @@ public class CourseController {
         this.courseService = courseService;
     }
 
-    // Endpoint to get all courses
+    // Get all courses
     @GetMapping
-    public List<Course> getAllCourses() {
-        return courseService.getAllCourses();
+    public ResponseEntity<ApiResponse<List<Course>>> getAllCourses() {
+        List<Course> courses = courseService.getAllCourses();
+        return ResponseEntity.ok(new ApiResponse<>(true, "Courses fetched successfully", courses));
     }
 
-    // Endpoint to create a new course
-    @PostMapping
-    public ResponseEntity<Course> saveCourse(@RequestBody Course course) {
-        return ResponseEntity.ok(courseService.saveCourse(course));
-    }
-
-    // Endpoint to get a course by ID
+    // Get a course by ID
     @GetMapping("/{id}")
-    public ResponseEntity<Course> getCourseById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Course>> getCourseById(@PathVariable Long id) {
         return courseService.getCourseById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .map(course -> ResponseEntity.ok(new ApiResponse<>(true, "Course fetched successfully", course)))
+                .orElse(ResponseEntity.status(404)
+                        .body(new ApiResponse<>(false, "Course with ID " + id + " not found", null)));
     }
 
-    // Endpoint to update a course
+    // Create a new course
+    @PostMapping
+    public ResponseEntity<ApiResponse<Course>> saveCourse(@RequestBody Course course) {
+        try {
+            Course savedCourse = courseService.saveCourse(course);
+            return ResponseEntity.ok(new ApiResponse<>(true, "Course created successfully", savedCourse));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse<>(false, e.getMessage(), null));
+        }
+    }
+
+    // Update an existing course
     @PutMapping("/{id}")
-    public ResponseEntity<Course> updateCourse(@PathVariable Long id, @RequestBody Course updatedCourse) {
-        return courseService.updateCourse(id, updatedCourse)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<ApiResponse<Course>> updateCourse(@PathVariable Long id, @RequestBody Course updatedCourse) {
+        try {
+            Course updated = courseService.updateCourse(id, updatedCourse);
+            return ResponseEntity.ok(new ApiResponse<>(true, "Course updated successfully", updated));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse<>(false, e.getMessage(), null));
+        }
     }
 
-    // Endpoint to delete a course
+    // Delete a course by ID
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCourse(@PathVariable Long id) {
-        if (courseService.deleteCourse(id)) {
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<ApiResponse<Void>> deleteCourseById(@PathVariable Long id) {
+        try {
+            courseService.deleteCourseById(id);
+            return ResponseEntity.ok(new ApiResponse<>(true, "Course deleted successfully", null));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse<>(false, e.getMessage(), null));
+        }
+    }
+
+    // Get all students of a course
+    @GetMapping("/{id}/students")
+    public ResponseEntity<ApiResponse<List<Student>>> getAllStudentsByCourse(@PathVariable Long id) {
+        try {
+            List<Student> students = courseService.getAllStudentsByCourse(id);
+            return ResponseEntity.ok(new ApiResponse<>(true, "Students fetched successfully", students));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse<>(false, e.getMessage(), null));
         }
     }
 }

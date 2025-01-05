@@ -1,11 +1,13 @@
 package com.ahmer.manytomany.Service;
 
-import com.ahmer.manytomany.Repository.CourseRepository;
 import com.ahmer.manytomany.Model.Course;
+import com.ahmer.manytomany.Model.Student;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import com.ahmer.manytomany.Repository.CourseRepository;
+
 
 @Service
 public class CourseService {
@@ -21,30 +23,41 @@ public class CourseService {
         return courseRepository.findAll();
     }
 
-    // Save a new course
-    public Course saveCourse(Course course) {
-        return courseRepository.save(course);
-    }
-
-    // Get a course by ID
+    // Fetch a course by ID
     public Optional<Course> getCourseById(Long id) {
         return courseRepository.findById(id);
     }
 
-    // Update an existing course
-    public Optional<Course> updateCourse(Long id, Course updatedCourse) {
-        return courseRepository.findById(id).map(course -> {
-            course.setTitle(updatedCourse.getTitle());
-            return courseRepository.save(course);
-        });
+    // Save a new course (only for creating standalone courses)
+    public Course saveCourse(Course course) {
+        if (course.getId() != null && courseRepository.existsById(course.getId())) {
+            throw new IllegalArgumentException("Course with ID " + course.getId() + " already exists.");
+        }
+        return courseRepository.save(course);
+    }
+
+    // Update an existing course by ID
+    public Course updateCourse(Long id, Course updatedCourse) {
+        return courseRepository.findById(id)
+                .map(existingCourse -> {
+                    existingCourse.setTitle(updatedCourse.getTitle());
+                    return courseRepository.save(existingCourse);
+                })
+                .orElseThrow(() -> new IllegalArgumentException("Course with ID " + id + " does not exist."));
     }
 
     // Delete a course by ID
-    public boolean deleteCourse(Long id) {
-        if (courseRepository.existsById(id)) {
-            courseRepository.deleteById(id);
-            return true;
+    public boolean deleteCourseById(Long id) {
+        if (!courseRepository.existsById(id)) {
+            throw new IllegalArgumentException("Course with ID " + id + " does not exist.");
         }
-        return false;
+        courseRepository.deleteById(id);
+        return true;
+    }
+
+    public List<Student> getAllStudentsByCourse(Long courseId) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new IllegalArgumentException("Course with ID " + courseId + " does not exist."));
+        return List.copyOf(course.getStudents()); // Convert Set to List
     }
 }
