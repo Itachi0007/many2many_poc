@@ -49,4 +49,20 @@ public class StudentController {
                     .body(new ApiResponse<>(false, e.getMessage(), null));
         }
     }
+
+    @PutMapping("/{studentId}/courses")
+    public ResponseEntity<ApiResponse<Student>> updateStudentCourses(
+            @PathVariable Long studentId,
+            @RequestBody List<Long> courseIds) {
+        try {
+            Student updatedStudent = studentService.updateStudentCourses(studentId, courseIds);
+            return ResponseEntity.ok(new ApiResponse<>(true, "Student courses updated successfully", updatedStudent));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse<>(false, e.getMessage(), null));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError()
+                    .body(new ApiResponse<>(false, "An unexpected error occurred", null));
+        }
+    }
 }

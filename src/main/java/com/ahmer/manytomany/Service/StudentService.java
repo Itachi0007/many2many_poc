@@ -55,4 +55,24 @@ public class StudentService {
                 .orElseThrow(() -> new IllegalArgumentException("Student with ID " + studentId + " does not exist."));
         return List.copyOf(student.getCourses());
     }
+
+    public Student updateStudentCourses(Long studentId, List<Long> courseIds) {
+        // Fetch the student
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new IllegalArgumentException("Student with ID " + studentId + " not found"));
+
+        // Fetch the courses by IDs
+        List<Course> courses = courseRepository.findAllById(courseIds);
+
+        // Validate that all course IDs exist
+        if (courses.size() != courseIds.size()) {
+            throw new IllegalArgumentException("Some course IDs are invalid");
+        }
+
+        // Update the student's courses
+        student.setCourses(new HashSet<>(courses));
+
+        // Save and return the updated student
+        return studentRepository.save(student);
+    }
 }
